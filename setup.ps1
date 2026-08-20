@@ -22,11 +22,6 @@ New-Item -ItemType Directory -Force -Path $TmpDir | Out-Null
 New-Item -ItemType Directory -Force -Path "$DdsBase\Projects" | Out-Null
 New-Item -ItemType Directory -Force -Path "$DdsBase\Logs" | Out-Null
 New-Item -ItemType Directory -Force -Path "$DdsBase\Certificates" | Out-Null
-New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\conf\extra" | Out-Null
-New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\logs" | Out-Null
-New-Item -ItemType Directory -Force -Path "$ServicesDir\php\ext" | Out-Null
-New-Item -ItemType Directory -Force -Path "$ServicesDir\mysql\data" | Out-Null
-New-Item -ItemType Directory -Force -Path "$ServicesDir\web\phpmyadmin" | Out-Null
 New-Item -ItemType Directory -Force -Path "$ServicesDir\web\phpinfo" | Out-Null
 
 # --- Step 1: Check / Setup Node.js ---
@@ -66,13 +61,10 @@ if (Test-Path $DdsUiDir) {
 Write-Host "[3/6] Verifying Web Server and Database Stack..." -ForegroundColor Cyan
 
 # Helper function to download and extract zip
-function Install-ZipPackage($pkgName, $pkgUrl, $targetPath, $subFolder = $null) {
-    if (Test-Path $targetPath) {
-        $items = Get-ChildItem -Path $targetPath -ErrorAction SilentlyContinue
-        if ($null -ne $items -and $items.Count -gt 0) {
-            Write-Host "      $pkgName is installed." -ForegroundColor Green
-            return
-        }
+function Install-ZipPackage($pkgName, $pkgUrl, $targetPath, $checkFile = $null, $subFolder = $null) {
+    if ($checkFile -and (Test-Path "$targetPath\$checkFile")) {
+        Write-Host "      $pkgName is installed." -ForegroundColor Green
+        return
     }
     
     Write-Host "      Downloading $pkgName..." -ForegroundColor Cyan
@@ -110,15 +102,19 @@ function Install-ZipPackage($pkgName, $pkgUrl, $targetPath, $subFolder = $null) 
 }
 
 # Install Core Stack if missing
-Install-ZipPackage "Apache 2.4" "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.63-250207-win64-VS17.zip" "$ServicesDir\apache" "Apache24"
-Install-ZipPackage "PHP 8.5" "https://windows.php.net/downloads/releases/php-8.5.9-nts-Win32-vs17-x64.zip" "$ServicesDir\php"
-Install-ZipPackage "phpMyAdmin" "https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip" "$ServicesDir\web\phpmyadmin"
+Install-ZipPackage "Apache 2.4" "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.63-250207-win64-VS17.zip" "$ServicesDir\apache" "bin\httpd.exe" "Apache24"
+Install-ZipPackage "PHP 8.5" "https://windows.php.net/downloads/releases/php-8.5.9-nts-Win32-vs17-x64.zip" "$ServicesDir\php" "php.exe"
+Install-ZipPackage "phpMyAdmin" "https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip" "$ServicesDir\web\phpmyadmin" "index.php"
+Install-ZipPackage "MariaDB 10.11" "https://downloads.mariadb.com/MariaDB/mariadb-10.11.8/winx64-packages/mariadb-10.11.8-winx64.zip" "$ServicesDir\mysql" "bin\mysqld.exe"
 
 # --- Step 4: Configure Stack Files ---
 Write-Host "[4/6] Applying optimized configurations..." -ForegroundColor Cyan
 
 # Ensure target directories exist before copy
-New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\conf" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\conf\extra" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\logs" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\php\ext" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\mysql\data" | Out-Null
 New-Item -ItemType Directory -Force -Path "$ServicesDir\web\phpmyadmin" | Out-Null
 
 # Sync master httpd.conf
@@ -131,6 +127,87 @@ if (Test-Path $SourceHttpd) {
 $SourcePmaConfig = Join-Path $ScriptDir "config.inc.php"
 if (Test-Path $SourcePmaConfig) {
     Copy-Item -Path $SourcePmaConfig -Destination "$ServicesDir\web\phpmyadmin\config.inc.php" -Force -ErrorAction SilentlyContinue
+}
+
+# Configure php.ini for PHP 8.5
+$PhpIniPath = "$ServicesDir\php\php.ini"
+if (Test-Path "$ServicesDir\php") {
+    if (-not (Test-Path $PhpIniPath) -and (Test-Path "$ServicesDir\php\php.ini-development")) {
+        Copy-Item -Path "$ServicesDir\php\php.ini-development" -Destination $PhpIniPath -Force
+    }
+    if (Test-Path $PhpIniPath) {
+        $iniContent = Get-Content $PhpIniPath -Raw -ErrorAction SilentlyContinue
+        if ($iniContent -notlike "*=== DDS Windows Configured php.ini ===*") {
+            $DdsIniAppend = @"
+
+; === DDS Windows Configured php.ini ===
+extension_dir = "C:/DDS/Services/php/ext"
+session.save_path = "C:/DDS/tmp"
+sys_temp_dir = "C:/DDS/tmp"
+upload_tmp_dir = "C:/DDS/tmp"
+session.cookie_httponly = 1
+session.use_only_cookies = 1
+session.gc_maxlifetime = 1440
+max_execution_time = 300
+memory_limit = 512M
+post_max_size = 128M
+upload_max_filesize = 128M
+date.timezone = UTC
+
+; Core Extensions
+extension=curl
+extension=fileinfo
+extension=gd
+extension=mbstring
+extension=mysqli
+extension=openssl
+extension=pdo_mysql
+extension=pdo_sqlite
+extension=sqlite3
+extension=zip
+"@
+            Add-Content -Path $PhpIniPath -Value $DdsIniAppend
+        }
+    }
+}
+
+# Configure MariaDB my.ini
+$MyIniPath = "$ServicesDir\mysql\my.ini"
+if (Test-Path "$ServicesDir\mysql") {
+    if (-not (Test-Path $MyIniPath)) {
+        $MyIniContent = @"
+[mysqld]
+port = 3306
+bind-address = 127.0.0.1
+datadir = "C:/DDS/Services/mysql/data"
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+default-storage-engine = INNODB
+max_connections = 100
+query_cache_size = 16M
+tmp_table_size = 32M
+thread_cache_size = 8
+myisam_max_sort_file_size = 100G
+myisam_sort_buffer_size = 32M
+key_buffer_size = 16M
+read_buffer_size = 256K
+read_rnd_buffer_size = 512K
+sort_buffer_size = 512K
+innodb_data_home_dir = "C:/DDS/Services/mysql/data"
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_group_home_dir = "C:/DDS/Services/mysql/data"
+innodb_buffer_pool_size = 128M
+innodb_log_file_size = 48M
+innodb_log_buffer_size = 8M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 50
+
+[client]
+port = 3306
+default-character-set = utf8mb4
+"@
+        [System.IO.File]::WriteAllText($MyIniPath, $MyIniContent)
+    }
 }
 
 # Setup standalone phpinfo page
