@@ -93,6 +93,10 @@ export async function startApache(ssl = false) {
     const apacheBin = PATHS.apacheBin;
     const apacheConf = PATHS.apacheConf;
     
+    if (!fs.existsSync(apacheBin)) {
+      throw new Error(`Apache binary not found at "${apacheBin}". Please run setup.bat to install.`);
+    }
+
     // Test config syntax first
     try {
       execSync(`"${apacheBin}" -t -f "${apacheConf}"`, { stdio: 'pipe' });
@@ -171,6 +175,9 @@ export async function startMysql() {
   if (isWindows) {
     const mysqlBin = PATHS.mysqlBin;
     const mysqlIni = PATHS.mysqlIni;
+    if (!fs.existsSync(mysqlBin)) {
+      throw new Error(`MariaDB binary not found at "${mysqlBin}". Please run setup.bat to install.`);
+    }
     const argList = fs.existsSync(mysqlIni) ? `--defaults-file=\\\"${mysqlIni}\\\"` : '';
     const psCmd = `Start-Process -FilePath '${mysqlBin}' -ArgumentList '${argList}' -WindowStyle Hidden`;
     try {

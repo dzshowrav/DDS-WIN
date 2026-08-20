@@ -42,6 +42,14 @@ export function ensureDir(dirPath) {
   return dirPath;
 }
 
+// Find existing executable from candidate paths
+function findExecutable(candidates, fallback) {
+  for (const c of candidates) {
+    if (c && fs.existsSync(c)) return c;
+  }
+  return fallback;
+}
+
 // Service Paths
 export const PATHS = {
   root: DDS_ROOT,
@@ -53,9 +61,14 @@ export const PATHS = {
   
   // Apache paths
   apacheBin: isWindows
-    ? (fs.existsSync(path.join(DDS_ROOT, 'Services/apache/bin/httpd.exe'))
-      ? path.join(DDS_ROOT, 'Services/apache/bin/httpd.exe')
-      : 'httpd.exe')
+    ? findExecutable([
+        path.join(DDS_ROOT, 'Services/apache/bin/httpd.exe'),
+        path.join(DDS_ROOT, 'Services/apache/Apache24/bin/httpd.exe'),
+        'C:/DDS/Services/apache/bin/httpd.exe',
+        'C:/DDS/Services/apache/Apache24/bin/httpd.exe',
+        'C:/Program Files/Apache/bin/httpd.exe',
+        'C:/Apache24/bin/httpd.exe'
+      ], 'C:/DDS/Services/apache/bin/httpd.exe')
     : 'apachectl',
   apacheConf: isWindows
     ? (fs.existsSync(path.join(DDS_ROOT, 'Services/apache/conf/httpd.conf'))
@@ -80,14 +93,17 @@ export const PATHS = {
 
   // PHP paths
   phpBin: isWindows
-    ? (fs.existsSync(path.join(DDS_ROOT, 'Services/php/php.exe'))
-      ? path.join(DDS_ROOT, 'Services/php/php.exe')
-      : 'php.exe')
+    ? findExecutable([
+        path.join(DDS_ROOT, 'Services/php/php.exe'),
+        'C:/DDS/Services/php/php.exe',
+        'C:/Program Files/PHP/php.exe'
+      ], 'C:/DDS/Services/php/php.exe')
     : 'php',
   phpCgiBin: isWindows
-    ? (fs.existsSync(path.join(DDS_ROOT, 'Services/php/php-cgi.exe'))
-      ? path.join(DDS_ROOT, 'Services/php/php-cgi.exe')
-      : 'php-cgi.exe')
+    ? findExecutable([
+        path.join(DDS_ROOT, 'Services/php/php-cgi.exe'),
+        'C:/DDS/Services/php/php-cgi.exe'
+      ], 'C:/DDS/Services/php/php-cgi.exe')
     : 'php-fpm',
   phpIni: isWindows
     ? path.join(DDS_ROOT, 'Services/php/php.ini')
@@ -95,19 +111,22 @@ export const PATHS = {
 
   // MySQL / MariaDB paths
   mysqlBin: isWindows
-    ? (fs.existsSync(path.join(DDS_ROOT, 'Services/mysql/bin/mysqld.exe'))
-      ? path.join(DDS_ROOT, 'Services/mysql/bin/mysqld.exe')
-      : 'mysqld.exe')
+    ? findExecutable([
+        path.join(DDS_ROOT, 'Services/mysql/bin/mysqld.exe'),
+        'C:/DDS/Services/mysql/bin/mysqld.exe'
+      ], 'C:/DDS/Services/mysql/bin/mysqld.exe')
     : 'mariadbd-safe',
   mysqlAdminBin: isWindows
-    ? (fs.existsSync(path.join(DDS_ROOT, 'Services/mysql/bin/mysqladmin.exe'))
-      ? path.join(DDS_ROOT, 'Services/mysql/bin/mysqladmin.exe')
-      : 'mysqladmin.exe')
+    ? findExecutable([
+        path.join(DDS_ROOT, 'Services/mysql/bin/mysqladmin.exe'),
+        'C:/DDS/Services/mysql/bin/mysqladmin.exe'
+      ], 'C:/DDS/Services/mysql/bin/mysqladmin.exe')
     : 'mysqladmin',
   mysqlCliBin: isWindows
-    ? (fs.existsSync(path.join(DDS_ROOT, 'Services/mysql/bin/mysql.exe'))
-      ? path.join(DDS_ROOT, 'Services/mysql/bin/mysql.exe')
-      : 'mysql.exe')
+    ? findExecutable([
+        path.join(DDS_ROOT, 'Services/mysql/bin/mysql.exe'),
+        'C:/DDS/Services/mysql/bin/mysql.exe'
+      ], 'C:/DDS/Services/mysql/bin/mysql.exe')
     : 'mariadb',
   mysqlIni: isWindows
     ? path.join(DDS_ROOT, 'Services/mysql/my.ini')
