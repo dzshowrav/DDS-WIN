@@ -8,7 +8,7 @@
 [![phpMyAdmin](https://img.shields.io/badge/phpMyAdmin-5.2.3-orange.svg)](https://www.phpmyadmin.net/)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/dzshowrav/DZDEV-SERVER-dds/main/assets/screenshot.jpg" alt="DDS Screenshot" width="650">
+  <img src="https://raw.githubusercontent.com/dzshowrav/DDS-WIN/main/assets/logo.png" alt="DDS Brand Logo" width="200">
 </p>
 
 **DDS** is a modern, lightweight, visual CLI-based local web development stack for **Windows (CMD, PowerShell, Windows Terminal)** and **Android (Termux)**. It provides a complete WAMP/LAMP-like environment featuring **Apache 2.4**, **MariaDB 10.11 / MySQL**, **PHP 8.5 (Latest Stable NTS)**, **phpMyAdmin 5.2.3**, and an interactive animated terminal dashboard.

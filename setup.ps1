@@ -250,7 +250,14 @@ $PhpInfoContent = "<?php phpinfo(); ?>"
 Set-Content -Path "$ServicesDir\web\phpinfo\index.php" -Value $PhpInfoContent -Encoding UTF8
 Set-Content -Path "$DdsBase\Projects\phpinfo.php" -Value $PhpInfoContent -Encoding UTF8
 
-# Setup default index.php if Projects is empty
+# Setup default index.php and copy brand logo
+$ProjectsAssetDir = "$DdsBase\Projects\assets"
+New-Item -ItemType Directory -Force -Path $ProjectsAssetDir | Out-Null
+$SourceLogo = Join-Path $ScriptDir "assets\logo.png"
+if (Test-Path $SourceLogo) {
+    Copy-Item -Path $SourceLogo -Destination "$ProjectsAssetDir\logo.png" -Force -ErrorAction SilentlyContinue
+}
+
 $IndexFile = "$DdsBase\Projects\index.php"
 if (!(Test-Path $IndexFile)) {
     $HtmlLines = @(
@@ -263,8 +270,10 @@ if (!(Test-Path $IndexFile)) {
         '  <style>',
         '    :root { --bg: #0d1117; --card-bg: #161b22; --text: #c9d1d9; --accent: #00d4aa; --border: #30363d; }',
         '    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 40px 20px; }',
-        '    .container { max-width: 650px; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }',
+        '    .container { max-width: 650px; width: 100%; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; }',
+        '    .logo { width: 120px; height: 120px; border-radius: 16px; margin-bottom: 16px; }',
         '    h1 { color: var(--accent); margin-top: 0; }',
+        '    p { text-align: left; }',
         '    .links { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; }',
         '    .btn { display: block; text-align: center; padding: 12px; background: #21262d; color: #58a6ff; text-decoration: none; border-radius: 6px; border: 1px solid var(--border); font-weight: 600; }',
         '    .btn:hover { background: #30363d; }',
@@ -272,8 +281,9 @@ if (!(Test-Path $IndexFile)) {
         '</head>',
         '<body>',
         '  <div class="container">',
+        '    <img class="logo" src="/assets/logo.png" alt="DDS Logo" onerror="this.style.display=''none''">',
         '    <h1>DDS Web Server <span style="font-size:0.5em; background:rgba(0,212,170,0.15); color:var(--accent); padding:4px 8px; border-radius:12px;">Online</span></h1>',
-        '    <p>Your local Apache, MariaDB, and PHP 8.5 development stack is active!</p>',
+        '    <p>Your local Apache 2.4, MariaDB 10.11, and PHP 8.5 development stack is active!</p>',
         '    <p><strong>PHP Version:</strong> <?php echo phpversion(); ?><br><strong>Document Root:</strong> <code><?php echo __DIR__; ?></code></p>',
         '    <div class="links">',
         '      <a class="btn" href="/phpmyadmin/">Open phpMyAdmin</a>',
