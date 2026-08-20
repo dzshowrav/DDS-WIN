@@ -624,14 +624,22 @@ export async function doUninstall() {
     default: false,
   }]);
 
+  const { wipeRepo } = await inquirer.prompt([{
+    type: 'confirm',
+    name: 'wipeRepo',
+    message: chalk.yellow('Do you want to delete this DDS application repository folder as well?'),
+    default: false,
+  }]);
+
   await doStop();
 
   if (isWindows) {
     const uninstallScript = path.join(APP_DIR, 'uninstall.ps1');
     if (existsSync(uninstallScript)) {
       const wipeFlag = wipeProjects ? '-WipeProjects' : '';
+      const repoFlag = wipeRepo ? '-WipeRepo' : '';
       try {
-        execSync(`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${uninstallScript}" -Force ${wipeFlag}`, {
+        execSync(`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${uninstallScript}" -Force ${wipeFlag} ${repoFlag}`, {
           stdio: 'inherit',
         });
       } catch {}
