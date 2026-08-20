@@ -26,14 +26,7 @@ Choose any of the following options:
 
 ---
 
-### 📦 Option 2: Standalone Installer `.exe` (Just Double-Click!)
-1. Download **[`DDS-Setup.exe`](https://github.com/dzshowrav/DDS-WIN/raw/main/DDS-Setup.exe)** *(~165 KB with embedded brand icon)*.
-2. Double-click to run the setup wizard.
-3. The installer fetches latest files, sets up services, and adds a Desktop shortcut with the DDS brand icon.
-
----
-
-### 💻 Option 3: 1-Line PowerShell Web Installer
+### 💻 Option 2: 1-Line PowerShell Web Installer
 Open **PowerShell** and paste:
 ```powershell
 irm https://raw.githubusercontent.com/dzshowrav/DDS-WIN/main/install.ps1 | iex
@@ -41,7 +34,7 @@ irm https://raw.githubusercontent.com/dzshowrav/DDS-WIN/main/install.ps1 | iex
 
 ---
 
-### 🐙 Option 4: Standard Git Clone & CLI Setup
+### 🐙 Option 3: Standard Git Clone & CLI Setup
 ```cmd
 git clone https://github.com/dzshowrav/DDS-WIN.git dds
 cd dds
@@ -194,7 +187,6 @@ The uninstaller will:
 ```
 DDS/
 ├── assets/         # Brand logos & multi-res ICO files
-├── DDS-Setup.exe   # Standalone Windows installer binary
 ├── dds.cmd         # CMD launcher wrapper
 ├── dds.bat         # Batch launcher wrapper
 ├── dds.ps1         # PowerShell launcher

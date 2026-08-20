@@ -6,6 +6,12 @@
       "port": 8080,
       "root": "C:/DDS/Projects",
       "ssl": false
+    },
+    {
+      "name": "test",
+      "port": 8081,
+      "root": "E:/test",
+      "ssl": false
     }
   ]
 }
