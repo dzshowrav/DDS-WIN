@@ -1,0 +1,3 @@
+# Precedence is from left to right
+# .php will be preferred
+DirectoryIndex index.php index.html index.htm index2.html default.html default.htm

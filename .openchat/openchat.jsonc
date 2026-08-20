@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openchat.ai/config.json",
+  "provider": {},
+  "permission": {},
+  "references": {
+    "tamp-skills": {
+      "path": ".openchat/skills",
+      "description": "Skills for TAMP (Termux Apache MariaDB PHP) project development and UI/UX upgrade",
+    },
+  },
+  "mcp": {},
+}

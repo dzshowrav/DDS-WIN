@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# DDS Universal CLI Launcher (Windows Git Bash / MSYS2 / Termux / Linux / macOS)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if command -v node >/dev/null 2>&1; then
+    exec node "$SCRIPT_DIR/dds-ui/index.js" "$@"
+elif [ -f "C:/Program Files/nodejs/node.exe" ]; then
+    exec "C:/Program Files/nodejs/node.exe" "$SCRIPT_DIR/dds-ui/index.js" "$@"
+else
+    echo "ERROR: Node.js is required to run DDS."
+    echo "Please install Node.js: https://nodejs.org/"
+    exit 1
+fi

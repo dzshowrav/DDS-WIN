@@ -1,0 +1,11 @@
+{
+  "defaultRoot": "C:/DDS/Projects",
+  "hosts": [
+    {
+      "name": "default",
+      "port": 8080,
+      "root": "C:/DDS/Projects",
+      "ssl": false
+    }
+  ]
+}

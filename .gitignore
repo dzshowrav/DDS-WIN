@@ -1,0 +1,19 @@
+# Logs
+*.log
+logs/
+Logs/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Operating System files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
