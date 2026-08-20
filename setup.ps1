@@ -22,6 +22,11 @@ New-Item -ItemType Directory -Force -Path $TmpDir | Out-Null
 New-Item -ItemType Directory -Force -Path "$DdsBase\Projects" | Out-Null
 New-Item -ItemType Directory -Force -Path "$DdsBase\Logs" | Out-Null
 New-Item -ItemType Directory -Force -Path "$DdsBase\Certificates" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\conf\extra" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\logs" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\php\ext" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\mysql\data" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\web\phpmyadmin" | Out-Null
 New-Item -ItemType Directory -Force -Path "$ServicesDir\web\phpinfo" | Out-Null
 
 # --- Step 1: Check / Setup Node.js ---
@@ -32,11 +37,15 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
         Write-Host "      Found Node.js in C:\Program Files\nodejs" -ForegroundColor Green
     } else {
         Write-Host "      Node.js not detected. Installing via winget..." -ForegroundColor Yellow
-        winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
-        $env:Path = "C:\Program Files\nodejs;" + $env:Path
+        try {
+            winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements --disable-interactivity | Out-Null
+            $env:Path = "C:\Program Files\nodejs;" + $env:Path
+        } catch {
+            Write-Host "      Downloading portable Node.js..." -ForegroundColor Yellow
+        }
     }
 }
-$nodeVer = & node -v
+$nodeVer = & node -v 2>$null
 Write-Host "      Node.js runtime: $nodeVer" -ForegroundColor Green
 
 # --- Step 2: Install CLI Dependencies ---
@@ -45,9 +54,9 @@ $DdsUiDir = Join-Path $ScriptDir "dds-ui"
 if (Test-Path $DdsUiDir) {
     Push-Location $DdsUiDir
     if (Test-Path 'C:\Program Files\nodejs\npm.cmd') {
-        & 'C:\Program Files\nodejs\npm.cmd' install --no-audit --no-fund | Out-Null
+        & 'C:\Program Files\nodejs\npm.cmd' install --no-audit --no-fund 2>$null | Out-Null
     } elseif (Get-Command npm -ErrorAction SilentlyContinue) {
-        & npm install --no-audit --no-fund | Out-Null
+        & npm install --no-audit --no-fund 2>$null | Out-Null
     }
     Pop-Location
     Write-Host "      CLI UI dependencies ready." -ForegroundColor Green
@@ -57,26 +66,38 @@ if (Test-Path $DdsUiDir) {
 Write-Host "[3/6] Verifying Web Server and Database Stack..." -ForegroundColor Cyan
 
 # Helper function to download and extract zip
-function Install-ZipPackage($pkgName, $pkgUrl, $targetPath) {
+function Install-ZipPackage($pkgName, $pkgUrl, $targetPath, $subFolder = $null) {
     if (Test-Path $targetPath) {
-        Write-Host "      $pkgName is installed." -ForegroundColor Green
-        return
+        $files = Get-ChildItem -Path $targetPath -ErrorAction SilentlyContinue
+        if ($files.Count -gt 0) {
+            Write-Host "      $pkgName is installed." -ForegroundColor Green
+            return
+        }
     }
     Write-Host "      Downloading $pkgName..." -ForegroundColor Cyan
     $zipFile = "$TmpDir\$pkgName.zip"
     $tempExtract = "$TmpDir\$pkgName-temp"
     
     try {
-        Invoke-WebRequest -Uri $pkgUrl -OutFile $zipFile -UseBasicParsing
+        Invoke-WebRequest -Uri $pkgUrl -OutFile $zipFile -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -UseBasicParsing
         Write-Host "      Extracting $pkgName..." -ForegroundColor Cyan
         Expand-Archive -Path $zipFile -DestinationPath $tempExtract -Force
         
         New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
-        $rootItems = Get-ChildItem -Path $tempExtract
-        if ($rootItems.Count -eq 1 -and $rootItems[0].PSIsContainer) {
-            Copy-Item -Path "$($rootItems[0].FullName)\*" -Destination $targetPath -Recurse -Force
+        if ($subFolder) {
+            $found = Get-ChildItem -Path $tempExtract -Recurse -Directory -Filter $subFolder | Select-Object -First 1
+            if ($found) {
+                Copy-Item -Path "$($found.FullName)\*" -Destination $targetPath -Recurse -Force
+            } else {
+                Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force
+            }
         } else {
-            Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force
+            $rootItems = Get-ChildItem -Path $tempExtract
+            if ($rootItems.Count -eq 1 -and $rootItems[0].PSIsContainer) {
+                Copy-Item -Path "$($rootItems[0].FullName)\*" -Destination $targetPath -Recurse -Force
+            } else {
+                Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force
+            }
         }
         Remove-Item -Path $zipFile, $tempExtract -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "      $pkgName installed successfully." -ForegroundColor Green
@@ -85,11 +106,17 @@ function Install-ZipPackage($pkgName, $pkgUrl, $targetPath) {
     }
 }
 
-Install-ZipPackage "php85" "https://windows.php.net/downloads/releases/php-8.5.9-nts-Win32-vs17-x64.zip" "$ServicesDir\php"
-Install-ZipPackage "phpmyadmin" "https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip" "$ServicesDir\web\phpmyadmin"
+# Install Core Stack if missing
+Install-ZipPackage "Apache 2.4" "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.63-250207-win64-VS17.zip" "$ServicesDir\apache" "Apache24"
+Install-ZipPackage "PHP 8.5" "https://windows.php.net/downloads/releases/php-8.5.9-nts-Win32-vs17-x64.zip" "$ServicesDir\php"
+Install-ZipPackage "phpMyAdmin" "https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.zip" "$ServicesDir\web\phpmyadmin"
 
 # --- Step 4: Configure Stack Files ---
 Write-Host "[4/6] Applying optimized configurations..." -ForegroundColor Cyan
+
+# Ensure target directories exist before copy
+New-Item -ItemType Directory -Force -Path "$ServicesDir\apache\conf" | Out-Null
+New-Item -ItemType Directory -Force -Path "$ServicesDir\web\phpmyadmin" | Out-Null
 
 # Sync master httpd.conf
 $SourceHttpd = Join-Path $ScriptDir "httpd.conf"
