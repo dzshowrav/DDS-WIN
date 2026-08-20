@@ -1,21 +1,24 @@
-# DDS (Dev Server Stack) for Windows
+# DDS (Dev Server Stack) for Windows & Android
 
 [![GitHub License](https://img.shields.io/github/license/dzshowrav/DZDEV-SERVER-dds?label=License)](https://github.com/dzshowrav/DZDEV-SERVER-dds/blob/main/LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011%20%7C%20Termux-blue.svg)](https://github.com/dzshowrav/DDS-WIN)
+[![PHP](https://img.shields.io/badge/PHP-8.5%20(Latest%20Stable)-8892BF.svg)](https://windows.php.net/)
+[![Apache](https://img.shields.io/badge/Apache-2.4.68%20(Win64)-red.svg)](https://www.apachelounge.com/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-10.11%20%2F%20MySQL-003545.svg)](https://mariadb.org/)
+[![phpMyAdmin](https://img.shields.io/badge/phpMyAdmin-5.2.3-orange.svg)](https://www.phpmyadmin.net/)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/dzshowrav/DZDEV-SERVER-dds/main/assets/screenshot.jpg" alt="DDS Screenshot" width="600">
+  <img src="https://raw.githubusercontent.com/dzshowrav/DZDEV-SERVER-dds/main/assets/screenshot.jpg" alt="DDS Screenshot" width="650">
 </p>
 
-**DDS** is a modern, lightweight, visual CLI-based local web server management stack for **Windows (CMD, PowerShell, Windows Terminal)** and **Android (Termux)**. It provides a complete WAMP/LAMP-like environment featuring **Apache 2.4**, **MariaDB 10.11 / MySQL**, **PHP 8.5 (Latest Stable)**, **phpMyAdmin 5.2.3**, and an interactive animated terminal dashboard.
+**DDS** is a modern, lightweight, visual CLI-based local web development stack for **Windows (CMD, PowerShell, Windows Terminal)** and **Android (Termux)**. It provides a complete WAMP/LAMP-like environment featuring **Apache 2.4**, **MariaDB 10.11 / MySQL**, **PHP 8.5 (Latest Stable NTS)**, **phpMyAdmin 5.2.3**, and an interactive animated terminal dashboard.
 
 ---
 
-## ⚡ 3-Step Quick Install (For Beginners)
+## ⚡ 3-Step Quick Install (Zero-Touch for Beginners)
 
-Prequites: install git before start setup.
-https://git-scm.com/install/windows
-
-No complex setup or manual package downloads required. The installer handles everything automatically:
+> [!NOTE]
+> Even on a brand new, 100% fresh Windows PC where nothing is pre-installed, `setup.bat` automatically downloads, extracts, and configures everything (Node.js, Apache 2.4, MariaDB 10.11, PHP 8.5, phpMyAdmin 5.2.3, MinGit).
 
 ### 1. Clone the repository
 Open **Command Prompt (CMD)** or **PowerShell** and run:
@@ -23,6 +26,7 @@ Open **Command Prompt (CMD)** or **PowerShell** and run:
 git clone https://github.com/dzshowrav/DDS-WIN.git dds
 cd dds
 ```
+*(If Git is not installed yet, download [Git for Windows](https://git-scm.com/install/windows) or download the ZIP from GitHub).*
 
 ### 2. Run the one-click installer
 - **In CMD (or Double-Click in File Explorer)**:
@@ -43,11 +47,11 @@ dds
 
 ## ✨ Features
 
-- **Interactive Visual CLI** — Beautiful full-screen terminal UI with real-time animated service badges (no need to memorize commands).
+- **Interactive Visual CLI** — Full-screen terminal dashboard with real-time animated service badges (no need to memorize commands).
 - **Apache HTTP Server 2.4** — High-performance web server listening on port `8080` (HTTP) and `8443` (HTTPS / SSL).
 - **MariaDB 10.11 / MySQL** — Fast SQL database on port `3306` with root access configured out of the box.
-- **PHP 8.5 (Latest Stable)** — Pre-configured with `mysqli`, `pdo_mysql`, `mbstring`, `curl`, `gd`, `zip`, `openssl`, and `Zend OPcache`.
-- **phpMyAdmin 5.2.3** — Web-based database management interface pre-configured at `/phpmyadmin` with passwordless local login.
+- **PHP 8.5 (Latest Stable)** — Pre-configured with `mysqli`, `pdo_mysql`, `mbstring`, `curl`, `gd`, `zip`, `openssl`, `fileinfo`, `sqlite3`, and `Zend OPcache`.
+- **phpMyAdmin 5.2.3** — Web-based database management interface pre-configured at `/phpmyadmin/` with passwordless local login.
 - **Virtual Host Manager** — Interactively add, edit, and delete multiple websites with custom ports and document roots.
 - **PHP Info Endpoint** — Built-in diagnostics at `/phpinfo/` and `/phpinfo.php`.
 - **Cross-Shell Support** — Native support for **CMD**, **PowerShell**, **Windows Terminal**, and **Git Bash**.
@@ -57,7 +61,7 @@ dds
 
 ## 🖥️ Visual CLI Interface
 
-Running `dds` without arguments opens the interactive terminal dashboard:
+Running `dds` without arguments opens the full interactive visual terminal:
 
 ```text
 ██████╗ ██████╗ ███████╗
@@ -90,7 +94,7 @@ Running `dds` without arguments opens the interactive terminal dashboard:
 
 ## 📖 CLI Commands Reference
 
-You can use the interactive menu or run direct subcommands from any folder:
+You can use the interactive menu or run direct subcommands from any directory:
 
 | Command | Description |
 |---|---|
@@ -101,7 +105,7 @@ You can use the interactive menu or run direct subcommands from any folder:
 | `dds restart` | Gracefully restart all services |
 | `dds status` | Display live status dashboard and quick browser links |
 | `dds hosts` | Open interactive Virtual Host Manager |
-| `dds root` | Change the default document root path |
+| `dds root [path]` | Change the default document root path |
 | `dds pma` | Directly open phpMyAdmin in your default browser |
 | `dds open` | Open the current document root in Windows File Explorer |
 | `dds update` | Update DDS configurations and dependencies |
@@ -134,7 +138,7 @@ Apache automatically reloads without interrupting active connections whenever ch
 - **User**: `root`
 - **Password**: *(empty / no password needed by default)*
 
-To connect from PHP:
+### Connecting from PHP:
 ```php
 <?php
 $conn = new mysqli('127.0.0.1', 'root', '', 'test_db');
