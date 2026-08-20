@@ -19,10 +19,14 @@
 
 Choose any of the following options:
 
-### 🌟 Option 1: 1-Click Batch Installer (`.bat` / Recommended)
-1. Clone or download the repository ZIP.
-2. Double-click **`setup.bat`** (or **`install.bat`**).
-3. Everything (Node.js, Apache 2.4, MariaDB 10.11, PHP 8.5, phpMyAdmin 5.2.3) is downloaded, configured, and a Desktop shortcut is created automatically!
+### 🌟 Option 1: Direct ZIP Download (Easiest — Just Double-Click!)
+
+[![Download ZIP](https://img.shields.io/badge/⬇%EF%B8%8F%20Download-DDS--Windows.zip%20(Ready--to--Run)-00d4aa?style=for-the-badge&logo=windows)](https://github.com/dzshowrav/DDS-WIN/raw/main/DDS-Windows.zip)
+
+1. Download **[`DDS-Windows.zip`](https://github.com/dzshowrav/DDS-WIN/raw/main/DDS-Windows.zip)**.
+2. Extract the ZIP folder anywhere on your PC (e.g. `C:\DDS` or your Desktop).
+3. Double-click **`setup.bat`**.
+4. That's it! Type `dds` in any terminal or double-click **`dds.bat`** to launch!
 
 ---
 
