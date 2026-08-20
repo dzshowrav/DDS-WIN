@@ -105,12 +105,12 @@ export async function startApache(ssl = false) {
       throw new Error(`Apache configuration error: ${msg.trim()}`);
     }
 
-    const psCmd = `Start-Process -FilePath '${apacheBin}' -ArgumentList '-f \"${apacheConf}\"' -WindowStyle Hidden`;
-    try {
-      execSync(`powershell.exe -NoProfile -Command "${psCmd}"`, { stdio: 'ignore' });
-    } catch {
-      spawn(apacheBin, ['-f', apacheConf], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
-    }
+    const child = spawn(apacheBin, ['-f', apacheConf], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    });
+    child.unref();
   } else {
     try {
       execSync('apachectl start 2>/dev/null', { stdio: 'ignore' });
@@ -178,14 +178,13 @@ export async function startMysql() {
     if (!fs.existsSync(mysqlBin)) {
       throw new Error(`MariaDB binary not found at "${mysqlBin}". Please run setup.bat to install.`);
     }
-    const argList = fs.existsSync(mysqlIni) ? `--defaults-file=\\\"${mysqlIni}\\\"` : '';
-    const psCmd = `Start-Process -FilePath '${mysqlBin}' -ArgumentList '${argList}' -WindowStyle Hidden`;
-    try {
-      execSync(`powershell.exe -NoProfile -Command "${psCmd}"`, { stdio: 'ignore' });
-    } catch {
-      const args = fs.existsSync(mysqlIni) ? [`--defaults-file=${mysqlIni}`] : [];
-      spawn(mysqlBin, args, { detached: true, stdio: 'ignore', windowsHide: true }).unref();
-    }
+    const args = fs.existsSync(mysqlIni) ? [`--defaults-file=${mysqlIni}`] : [];
+    const child = spawn(mysqlBin, args, {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    });
+    child.unref();
   } else {
     try {
       execSync(`mariadbd-safe --pid-file="${PATHS.mysqlPidFile}" &`, { stdio: 'ignore' });

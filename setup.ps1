@@ -241,7 +241,7 @@ if (Test-Path "$ServicesDir\mysql") {
             'port = 3306',
             'default-character-set = utf8mb4'
         ) -join "`r`n"
-        Set-Content -Path $MyIniPath -Value $MyIniConfig -Encoding UTF8
+        Set-Content -Path $MyIniPath -Value $MyIniConfig -Encoding ASCII
     }
 }
 
