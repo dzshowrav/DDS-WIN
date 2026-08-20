@@ -13,6 +13,7 @@
 ## ⚡ 3-Step Quick Install (For Beginners)
 
 Prequites: install git before start setup.
+https://git-scm.com/install/windows
 
 No complex setup or manual package downloads required. The installer handles everything automatically:
 
