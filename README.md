@@ -19,14 +19,21 @@
 
 Choose any of the following options:
 
-### 🌟 Option 1: Standalone Installer `.exe` (Easiest — Just Double-Click!)
-1. Download **[`DDS-Setup.exe`](https://github.com/dzshowrav/DDS-WIN/raw/main/DDS-Setup.exe)**.
-2. Double-click to run the setup wizard.
-3. Everything is automatically downloaded, configured, and a Desktop shortcut is created!
+### 🌟 Option 1: 1-Click Batch Installer (`.bat` / Recommended)
+1. Clone or download the repository ZIP.
+2. Double-click **`setup.bat`** (or **`install.bat`**).
+3. Everything (Node.js, Apache 2.4, MariaDB 10.11, PHP 8.5, phpMyAdmin 5.2.3) is downloaded, configured, and a Desktop shortcut is created automatically!
 
 ---
 
-### 💻 Option 2: 1-Line PowerShell Web Installer
+### 📦 Option 2: Standalone Installer `.exe` (Just Double-Click!)
+1. Download **[`DDS-Setup.exe`](https://github.com/dzshowrav/DDS-WIN/raw/main/DDS-Setup.exe)** *(~165 KB with embedded brand icon)*.
+2. Double-click to run the setup wizard.
+3. The installer fetches latest files, sets up services, and adds a Desktop shortcut with the DDS brand icon.
+
+---
+
+### 💻 Option 3: 1-Line PowerShell Web Installer
 Open **PowerShell** and paste:
 ```powershell
 irm https://raw.githubusercontent.com/dzshowrav/DDS-WIN/main/install.ps1 | iex
@@ -34,7 +41,7 @@ irm https://raw.githubusercontent.com/dzshowrav/DDS-WIN/main/install.ps1 | iex
 
 ---
 
-### 🐙 Option 3: Standard Git Clone & Setup
+### 🐙 Option 4: Standard Git Clone & CLI Setup
 ```cmd
 git clone https://github.com/dzshowrav/DDS-WIN.git dds
 cd dds
@@ -42,6 +49,18 @@ setup.bat
 ```
 
 *Then simply type `dds` in any terminal window to launch!*
+
+---
+
+## 📂 Windows `.bat` / `.cmd` Shortcuts Reference
+
+| Batch File | How to Use | Purpose |
+|---|---|---|
+| **`setup.bat`** | Double-Click | 1-Click automated full stack installation and environment setup |
+| **`install.bat`** | Double-Click | Standalone web downloader and installer |
+| **`dds.bat`** / **`dds.cmd`** | Double-Click | Launch interactive visual CLI dashboard |
+| **`uninstall.bat`** | Double-Click | 100% clean, deep uninstaller (removes services, binaries, and PATH) |
+| **`update.bat`** | Double-Click | Pull latest GitHub updates and reload Apache virtual hosts |
 
 ---
 
@@ -109,7 +128,7 @@ You can use the interactive menu or run direct subcommands from any directory:
 | `dds pma` | Directly open phpMyAdmin in your default browser |
 | `dds open` | Open the current document root in Windows File Explorer |
 | `dds update` | Update DDS configurations and dependencies |
-| `dds uninstall` | Stop all services and clean up temporary files |
+| `dds uninstall` | 100% clean uninstallation (stops processes, removes files & PATH) |
 | `dds help` | Display command help |
 
 ---
@@ -151,16 +170,40 @@ echo "Connected successfully to MariaDB / MySQL!";
 
 ---
 
+## 🗑️ Complete Uninstallation
+
+To completely remove DDS and all its installed runtime binaries, services, caches, and Windows PATH entries:
+
+1. **Via CLI**:
+   ```cmd
+   dds uninstall
+   ```
+2. **Via Batch File**:
+   Double-click **`uninstall.bat`** in the DDS folder.
+
+The uninstaller will:
+- Terminate all running Apache, MariaDB, and PHP processes.
+- Clean and restore the Windows User `PATH` environment variable.
+- Delete `C:\DDS\Services`, `C:\DDS\Logs`, `C:\DDS\Certificates`, and `C:\DDS\tmp`.
+- Ask if you want to wipe or preserve your website files in `C:\DDS\Projects`.
+
+---
+
 ## 📁 Directory Structure
 
 ```
 DDS/
+├── assets/         # Brand logos & multi-res ICO files
+├── DDS-Setup.exe   # Standalone Windows installer binary
 ├── dds.cmd         # CMD launcher wrapper
 ├── dds.bat         # Batch launcher wrapper
 ├── dds.ps1         # PowerShell launcher
 ├── dds             # Universal bash launcher (Git Bash / Linux / Termux)
 ├── setup.bat       # Windows 1-Click CMD / Explorer installer
 ├── setup.ps1       # Windows automated PowerShell installer
+├── install.bat     # Windows easy batch installer
+├── install.cmd     # Windows easy cmd installer
+├── install.ps1     # Windows 1-line PowerShell web installer
 ├── update.bat      # Windows CMD updater
 ├── update.ps1      # Windows PowerShell updater
 ├── uninstall.bat   # Windows 1-Click clean uninstaller
@@ -199,7 +242,7 @@ dds start-ssl
 |---|---|
 | `dds` not recognized in new terminal | Re-open your terminal window so the updated User `PATH` takes effect, or run `setup.bat`. |
 | Port 8080 or 3306 is in use | Stop any other local servers (e.g. IIS, old XAMPP) or create a custom host with a different port via `dds hosts`. |
-| Execution Policy error in PowerShell | Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` or use `dds.cmd`. |
+| Execution Policy error in PowerShell | Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` or use `dds.cmd` / `dds.bat`. |
 | phpMyAdmin shows session error | Run `dds restart` to ensure `C:\DDS\tmp` is active. |
 
 ---
