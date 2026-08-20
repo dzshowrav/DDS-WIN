@@ -315,6 +315,23 @@ try {
     Write-Host "      Registered in current session." -ForegroundColor Yellow
 }
 
+# Create Desktop Shortcut
+try {
+    $DesktopPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::DesktopDirectory)
+    $ShortcutPath = Join-Path $DesktopPath "DDS Server Control.lnk"
+    $WshShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
+    $Shortcut.TargetPath = (Join-Path $ScriptDir "dds.cmd")
+    $Shortcut.WorkingDirectory = $ScriptDir
+    $IconPath = Join-Path $ScriptDir "assets\dds.ico"
+    if (Test-Path $IconPath) {
+        $Shortcut.IconLocation = $IconPath
+    }
+    $Shortcut.Description = "DDS Local Web Server Stack Manager"
+    $Shortcut.Save()
+    Write-Host "      [OK] Desktop shortcut 'DDS Server Control' created." -ForegroundColor Green
+} catch {}
+
 Write-Host ""
 Write-Host "  =======================================================" -ForegroundColor Green
 Write-Host "                DDS Installation Complete!               " -ForegroundColor Green

@@ -54,9 +54,13 @@ try {
     $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
     $Shortcut.TargetPath = (Join-Path $TargetDir "dds.cmd")
     $Shortcut.WorkingDirectory = $TargetDir
+    $IconPath = Join-Path $TargetDir "assets\dds.ico"
+    if (Test-Path $IconPath) {
+        $Shortcut.IconLocation = $IconPath
+    }
     $Shortcut.Description = "DDS Local Web Server Stack Manager"
     $Shortcut.Save()
-    Write-Host "      [OK] Desktop shortcut created." -ForegroundColor Green
+    Write-Host "      [OK] Desktop shortcut created with brand icon." -ForegroundColor Green
 } catch {}
 
 Write-Host ""

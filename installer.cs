@@ -101,7 +101,7 @@ namespace DDSInstaller
 
                 CreateDesktopShortcut(targetDir);
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("      [OK] Desktop shortcut 'DDS Server Control' created.");
+                Console.WriteLine("      [OK] Desktop shortcut 'DDS Server Control' created with brand icon.");
                 Console.ResetColor();
 
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -172,6 +172,7 @@ namespace DDSInstaller
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string shortcutPath = Path.Combine(desktopPath, "DDS Server Control.lnk");
                 string targetFile = Path.Combine(targetDir, "dds.cmd");
+                string iconFile = Path.Combine(targetDir, @"assets\dds.ico");
 
                 string vbsScript = string.Format(@"
 Set oWS = WScript.CreateObject(""WScript.Shell"")
@@ -179,9 +180,10 @@ sLinkFile = ""{0}""
 Set oLink = oWS.CreateShortcut(sLinkFile)
 oLink.TargetPath = ""{1}""
 oLink.WorkingDirectory = ""{2}""
+oLink.IconLocation = ""{3}""
 oLink.Description = ""DDS Local Server Stack Manager""
 oLink.Save
-", shortcutPath, targetFile, targetDir);
+", shortcutPath, targetFile, targetDir, iconFile);
 
                 string tempVbs = Path.Combine(Path.GetTempPath(), "create_dds_shortcut.vbs");
                 File.WriteAllText(tempVbs, vbsScript);
