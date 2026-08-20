@@ -1,4 +1,4 @@
-# DDS (Dev Server Stack) for Windows & Termux
+# DDS (Dev Server Stack) for Windows
 
 [![GitHub License](https://img.shields.io/github/license/dzshowrav/DZDEV-SERVER-dds?label=License)](https://github.com/dzshowrav/DZDEV-SERVER-dds/blob/main/LICENSE)
 
@@ -6,69 +6,66 @@
   <img src="https://raw.githubusercontent.com/dzshowrav/DZDEV-SERVER-dds/main/assets/screenshot.jpg" alt="DDS Screenshot" width="600">
 </p>
 
-**DDS** is a modern, lightweight, visual CLI-based local web server management stack for **Windows (CMD & PowerShell)** and **Android (Termux)**. It provides a complete LAMP/WAMP-like environment featuring **Apache httpd**, **MariaDB / MySQL**, **PHP 8 (FastCGI)**, **phpMyAdmin**, and an interactive animated terminal interface.
+**DDS** is a modern, lightweight, visual CLI-based local web server management stack for **Windows (CMD, PowerShell, Windows Terminal)** and **Android (Termux)**. It provides a complete WAMP/LAMP-like environment featuring **Apache 2.4**, **MariaDB 10.11 / MySQL**, **PHP 8.5 (Latest Stable)**, **phpMyAdmin 5.2.3**, and an interactive animated terminal dashboard.
+
+---
+
+## ⚡ 3-Step Quick Install (For Beginners)
+
+No complex setup or manual package downloads required. The installer handles everything automatically:
+
+### 1. Clone the repository
+Open **Command Prompt (CMD)** or **PowerShell** and run:
+```cmd
+git clone https://github.com/dzshowrav/DDS-WIN.git dds
+cd dds
+```
+
+### 2. Run the one-click installer
+- **In CMD (or Double-Click in File Explorer)**:
+  ```cmd
+  setup.bat
+  ```
+- **In PowerShell**:
+  ```powershell
+  .\setup.ps1
+  ```
+
+### 3. Launch DDS!
+```cmd
+dds
+```
 
 ---
 
 ## ✨ Features
 
-- **Interactive Visual CLI** — Beautiful terminal menu with real-time animated service badges (no need to memorize commands)
-- **Apache HTTP Server** — High-performance web server on port `8080` (HTTP) and `8443` (HTTPS / SSL)
-- **MariaDB / MySQL Database** — Fast SQL database on port `3306` with root access configured out of the box
-- **PHP 8 (FastCGI)** — FastCGI daemon on `127.0.0.1:9000` via `mod_proxy_fcgi` for high performance
-- **phpMyAdmin** — Web-based database management interface pre-configured at `/phpmyadmin`
-- **Virtual Host Manager** — Interactive management for multiple sites with custom ports and document roots
-- **Live Status & Quick Links** — Real-time health monitoring with clickable browser launch actions
-- **Cross-Shell Support** — Native support for Windows **CMD**, **PowerShell**, **Windows Terminal**, and **Git Bash**
-- **Persistent JSON Config** — Configuration saved in `hosts.json`
-
----
-
-## 🚀 Quick Start on Windows
-
-### Prerequisites
-- Windows 10 / 11
-- [Node.js](https://nodejs.org/) (installed automatically by setup if missing)
-
-### Installation
-
-1. Open **Command Prompt (CMD)** or **PowerShell** as Administrator or regular user.
-2. Navigate to the project directory:
-   ```cmd
-   cd "E:\DZDEV\DDS WIN"
-   ```
-3. Run the setup installer:
-   - **In CMD:**
-     ```cmd
-     setup.bat
-     ```
-   - **In PowerShell:**
-     ```powershell
-     powershell -ExecutionPolicy Bypass -File .\setup.ps1
-     ```
-4. Once completed, `dds` is registered in your User `PATH`. You can run `dds` from any folder!
-
-5. Launch DDS:
-   ```cmd
-   dds
-   ```
+- **Interactive Visual CLI** — Beautiful full-screen terminal UI with real-time animated service badges (no need to memorize commands).
+- **Apache HTTP Server 2.4** — High-performance web server listening on port `8080` (HTTP) and `8443` (HTTPS / SSL).
+- **MariaDB 10.11 / MySQL** — Fast SQL database on port `3306` with root access configured out of the box.
+- **PHP 8.5 (Latest Stable)** — Pre-configured with `mysqli`, `pdo_mysql`, `mbstring`, `curl`, `gd`, `zip`, `openssl`, and `Zend OPcache`.
+- **phpMyAdmin 5.2.3** — Web-based database management interface pre-configured at `/phpmyadmin` with passwordless local login.
+- **Virtual Host Manager** — Interactively add, edit, and delete multiple websites with custom ports and document roots.
+- **PHP Info Endpoint** — Built-in diagnostics at `/phpinfo/` and `/phpinfo.php`.
+- **Cross-Shell Support** — Native support for **CMD**, **PowerShell**, **Windows Terminal**, and **Git Bash**.
+- **Persistent JSON Config** — Configuration saved in `hosts.json`.
 
 ---
 
 ## 🖥️ Visual CLI Interface
 
-Running `dds` without arguments opens the full interactive visual terminal:
+Running `dds` without arguments opens the interactive terminal dashboard:
 
-```
+```text
 ██████╗ ██████╗ ███████╗
 ██╔══██╗██╔══██╗██╔════╝
 ██║  ██║██║  ██║███████╗
 ██║  ██║██║  ██║╚════██║
 ██████╔╝██████╔╝███████║
 ╚═════╝ ╚═════╝ ╚══════╝
-═══════════════════════════
-   Windows · Apache · MariaDB · PHP
-       ●  ACTIVE · Apache + MariaDB + PHP · ◜
+═══════════════════════════════════════
+   Windows · Apache · MariaDB · PHP 8.5
+       ●  ACTIVE · Apache + MariaDB · ◜
 
   ❯ Start DDS
     Start SSL
@@ -84,16 +81,18 @@ Running `dds` without arguments opens the full interactive visual terminal:
     Exit
 ```
 
+*Navigate with arrow keys and press Enter to select.*
+
 ---
 
 ## 📖 CLI Commands Reference
 
-You can use the interactive menu or run direct commands:
+You can use the interactive menu or run direct subcommands from any folder:
 
 | Command | Description |
 |---|---|
-| `dds` | Open interactive visual menu |
-| `dds start` | Start all services (Apache on :8080, MariaDB on :3306, PHP FastCGI) |
+| `dds` | Open interactive visual dashboard |
+| `dds start` | Start all services (Apache on :8080, MariaDB on :3306, PHP 8.5) |
 | `dds start-ssl` | Start with HTTPS SSL enabled (:8443) |
 | `dds stop` | Gracefully stop all running services |
 | `dds restart` | Gracefully restart all services |
@@ -110,18 +109,18 @@ You can use the interactive menu or run direct commands:
 
 ## 🌐 Virtual Hosts
 
-DDS allows hosting multiple independent websites on custom ports.
+DDS allows hosting multiple independent websites simultaneously on custom ports.
 
 ### Managing Hosts via CLI:
 ```cmd
 dds hosts
 ```
 Options available:
-- **Create Host**: Specify name, port (e.g. `8082`), and directory path (e.g. `C:/DDS/Projects/mysite`).
+- **Create Host**: Specify site name, custom port (e.g. `8082`), and directory path (e.g. `C:/DDS/Projects/mysite`).
 - **Edit Host**: Modify port or document root.
 - **Delete Host**: Remove virtual host configuration.
 
-Apache automatically reloads without service interruption whenever changes are made.
+Apache automatically reloads without interrupting active connections whenever changes are made.
 
 ---
 
@@ -132,14 +131,14 @@ Apache automatically reloads without service interruption whenever changes are m
 - **User**: `root`
 - **Password**: *(empty / no password needed by default)*
 
-To connect via PHP script:
+To connect from PHP:
 ```php
 <?php
 $conn = new mysqli('127.0.0.1', 'root', '', 'test_db');
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-echo "Connected successfully to MariaDB/MySQL!";
+echo "Connected successfully to MariaDB / MySQL!";
 ?>
 ```
 
@@ -153,8 +152,8 @@ DDS/
 ├── dds.bat         # Batch launcher wrapper
 ├── dds.ps1         # PowerShell launcher
 ├── dds             # Universal bash launcher (Git Bash / Linux / Termux)
-├── setup.bat       # Windows CMD installer
-├── setup.ps1       # Windows PowerShell installer
+├── setup.bat       # Windows 1-Click CMD / Explorer installer
+├── setup.ps1       # Windows automated PowerShell installer
 ├── update.bat      # Windows CMD updater
 ├── update.ps1      # Windows PowerShell updater
 ├── httpd.conf      # Master Apache configuration template
@@ -190,9 +189,9 @@ dds start-ssl
 | Issue | Resolution |
 |---|---|
 | `dds` not recognized in new terminal | Re-open your terminal window so the updated User `PATH` takes effect, or run `setup.bat`. |
-| Port 8080 or 3306 is in use | Stop any other local servers (e.g. IIS, Skype, old XAMPP) or create a custom host with a different port via `dds hosts`. |
+| Port 8080 or 3306 is in use | Stop any other local servers (e.g. IIS, old XAMPP) or create a custom host with a different port via `dds hosts`. |
 | Execution Policy error in PowerShell | Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` or use `dds.cmd`. |
-| phpMyAdmin shows connection error | Run `dds restart` to ensure MariaDB is running on port 3306. |
+| phpMyAdmin shows session error | Run `dds restart` to ensure `C:\DDS\tmp` is active. |
 
 ---
 
