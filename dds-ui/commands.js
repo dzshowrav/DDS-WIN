@@ -602,20 +602,48 @@ export function doUpdate() {
 }
 
 export async function doUninstall() {
-  const { confirm } = await inquirer.prompt([{
+  renderHeader('Uninstall DDS');
+
+  const { confirmUninstall } = await inquirer.prompt([{
     type: 'confirm',
-    name: 'confirm',
-    message: chalk.red('Are you sure you want to uninstall / stop all DDS services?\n') +
-      chalk.dim('  This will stop all running web server processes.\n'),
+    name: 'confirmUninstall',
+    message: chalk.red.bold('Are you sure you want to completely uninstall DDS from your computer?\n') +
+      chalk.dim('  This will stop all servers, remove runtime binaries, and clean your Windows PATH.\n'),
     default: false,
   }]);
 
-  if (!confirm) {
-    console.log(chalk.dim('\n  Uninstall cancelled.\n'));
+  if (!confirmUninstall) {
+    console.log(chalk.dim('\n  Uninstallation cancelled.\n'));
     return;
   }
 
+  const { wipeProjects } = await inquirer.prompt([{
+    type: 'confirm',
+    name: 'wipeProjects',
+    message: chalk.yellow('Do you also want to delete all website project files in C:\\DDS\\Projects?'),
+    default: false,
+  }]);
+
   await doStop();
-  console.log(chalk.green('\n  DDS services have been stopped and reset.\n'));
+
+  if (isWindows) {
+    const uninstallScript = path.join(APP_DIR, 'uninstall.ps1');
+    if (existsSync(uninstallScript)) {
+      const wipeFlag = wipeProjects ? '-WipeProjects' : '';
+      try {
+        execSync(`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${uninstallScript}" -Force ${wipeFlag}`, {
+          stdio: 'inherit',
+        });
+      } catch {}
+    }
+  } else {
+    // Termux / POSIX cleanup
+    try {
+      execSync('rm -rf /data/data/com.termux/files/usr/etc/apache2/conf.d/dds-vhosts.conf', { stdio: 'ignore' });
+      execSync('rm -rf /sdcard/htdocs/phpmyadmin', { stdio: 'ignore' });
+    } catch {}
+    console.log(chalk.green('\n  ✓ DDS services have been uninstalled and cleaned.\n'));
+  }
+
   process.exit(0);
 }

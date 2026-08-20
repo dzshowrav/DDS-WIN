@@ -163,6 +163,8 @@ DDS/
 ├── setup.ps1       # Windows automated PowerShell installer
 ├── update.bat      # Windows CMD updater
 ├── update.ps1      # Windows PowerShell updater
+├── uninstall.bat   # Windows 1-Click clean uninstaller
+├── uninstall.ps1   # Windows automated PowerShell uninstaller
 ├── httpd.conf      # Master Apache configuration template
 ├── config.inc.php  # phpMyAdmin configuration template
 ├── hosts.json      # Virtual host definition storage
