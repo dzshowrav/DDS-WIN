@@ -173,7 +173,7 @@ if (Test-Path "$ServicesDir\php") {
     if (Test-Path $PhpIniPath) {
         $iniContent = Get-Content $PhpIniPath -Raw -ErrorAction SilentlyContinue
         if ($iniContent -notlike "*=== DDS Windows Configured php.ini ===*") {
-            $DdsIniLines = @(
+            $DdsIniConfig = @(
                 "",
                 "; === DDS Windows Configured php.ini ===",
                 'extension_dir = "C:/DDS/Services/php/ext"',
@@ -200,8 +200,8 @@ if (Test-Path "$ServicesDir\php") {
                 'extension=pdo_sqlite',
                 'extension=sqlite3',
                 'extension=zip'
-            )
-            [System.IO.File]::AppendAllLines($PhpIniPath, $DdsIniLines)
+            ) -join "`r`n"
+            Add-Content -Path $PhpIniPath -Value $DdsIniConfig -Encoding UTF8
         }
     }
 }
@@ -210,7 +210,7 @@ if (Test-Path "$ServicesDir\php") {
 $MyIniPath = "$ServicesDir\mysql\my.ini"
 if (Test-Path "$ServicesDir\mysql") {
     if (-not (Test-Path $MyIniPath)) {
-        $MyIniLines = @(
+        $MyIniConfig = @(
             '[mysqld]',
             'port = 3306',
             'bind-address = 127.0.0.1',
@@ -240,15 +240,15 @@ if (Test-Path "$ServicesDir\mysql") {
             '[client]',
             'port = 3306',
             'default-character-set = utf8mb4'
-        )
-        [System.IO.File]::WriteAllLines($MyIniPath, $MyIniLines)
+        ) -join "`r`n"
+        Set-Content -Path $MyIniPath -Value $MyIniConfig -Encoding UTF8
     }
 }
 
 # Setup standalone phpinfo page
 $PhpInfoContent = "<?php phpinfo(); ?>"
-[System.IO.File]::WriteAllText("$ServicesDir\web\phpinfo\index.php", $PhpInfoContent)
-[System.IO.File]::WriteAllText("$DdsBase\Projects\phpinfo.php", $PhpInfoContent)
+Set-Content -Path "$ServicesDir\web\phpinfo\index.php" -Value $PhpInfoContent -Encoding UTF8
+Set-Content -Path "$DdsBase\Projects\phpinfo.php" -Value $PhpInfoContent -Encoding UTF8
 
 # Setup default index.php if Projects is empty
 $IndexFile = "$DdsBase\Projects\index.php"
@@ -282,8 +282,8 @@ if (!(Test-Path $IndexFile)) {
         '  </div>',
         '</body>',
         '</html>'
-    )
-    [System.IO.File]::WriteAllLines($IndexFile, $HtmlLines)
+    ) -join "`r`n"
+    Set-Content -Path $IndexFile -Value $HtmlLines -Encoding UTF8
 }
 
 Write-Host "      [OK] Stack configurations synced." -ForegroundColor Green
