@@ -12,6 +12,8 @@
 
 ## ⚡ 3-Step Quick Install (For Beginners)
 
+Prequites: install git before start setup.
+
 No complex setup or manual package downloads required. The installer handles everything automatically:
 
 ### 1. Clone the repository
