@@ -15,33 +15,33 @@
 
 ---
 
-## ⚡ 3-Step Quick Install (Zero-Touch for Beginners)
+## ⚡ Easy Installation Methods
 
-> [!NOTE]
-> Even on a brand new, 100% fresh Windows PC where nothing is pre-installed, `setup.bat` automatically downloads, extracts, and configures everything (Node.js, Apache 2.4, MariaDB 10.11, PHP 8.5, phpMyAdmin 5.2.3, MinGit).
+Choose any of the following options:
 
-### 1. Clone the repository
-Open **Command Prompt (CMD)** or **PowerShell** and run:
+### 🌟 Option 1: Standalone Installer `.exe` (Easiest — Just Double-Click!)
+1. Download **[`DDS-Setup.exe`](https://github.com/dzshowrav/DDS-WIN/raw/main/DDS-Setup.exe)**.
+2. Double-click to run the setup wizard.
+3. Everything is automatically downloaded, configured, and a Desktop shortcut is created!
+
+---
+
+### 💻 Option 2: 1-Line PowerShell Web Installer
+Open **PowerShell** and paste:
+```powershell
+irm https://raw.githubusercontent.com/dzshowrav/DDS-WIN/main/install.ps1 | iex
+```
+
+---
+
+### 🐙 Option 3: Standard Git Clone & Setup
 ```cmd
 git clone https://github.com/dzshowrav/DDS-WIN.git dds
 cd dds
+setup.bat
 ```
-*(If Git is not installed yet, download [Git for Windows](https://git-scm.com/install/windows) or download the ZIP from GitHub).*
 
-### 2. Run the one-click installer
-- **In CMD (or Double-Click in File Explorer)**:
-  ```cmd
-  setup.bat
-  ```
-- **In PowerShell**:
-  ```powershell
-  .\setup.ps1
-  ```
-
-### 3. Launch DDS!
-```cmd
-dds
-```
+*Then simply type `dds` in any terminal window to launch!*
 
 ---
 
