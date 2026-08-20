@@ -68,35 +68,38 @@ Write-Host "[3/6] Verifying Web Server and Database Stack..." -ForegroundColor C
 # Helper function to download and extract zip
 function Install-ZipPackage($pkgName, $pkgUrl, $targetPath, $subFolder = $null) {
     if (Test-Path $targetPath) {
-        $files = Get-ChildItem -Path $targetPath -ErrorAction SilentlyContinue
-        if ($files.Count -gt 0) {
+        $items = Get-ChildItem -Path $targetPath -ErrorAction SilentlyContinue
+        if ($null -ne $items -and $items.Count -gt 0) {
             Write-Host "      $pkgName is installed." -ForegroundColor Green
             return
         }
     }
+    
     Write-Host "      Downloading $pkgName..." -ForegroundColor Cyan
     $zipFile = "$TmpDir\$pkgName.zip"
     $tempExtract = "$TmpDir\$pkgName-temp"
     
     try {
+        New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
         Invoke-WebRequest -Uri $pkgUrl -OutFile $zipFile -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -UseBasicParsing
         Write-Host "      Extracting $pkgName..." -ForegroundColor Cyan
         Expand-Archive -Path $zipFile -DestinationPath $tempExtract -Force
         
-        New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
-        if ($subFolder) {
-            $found = Get-ChildItem -Path $tempExtract -Recurse -Directory -Filter $subFolder | Select-Object -First 1
-            if ($found) {
-                Copy-Item -Path "$($found.FullName)\*" -Destination $targetPath -Recurse -Force
+        if (Test-Path $tempExtract) {
+            if ($subFolder) {
+                $found = Get-ChildItem -Path $tempExtract -Recurse -Directory -Filter $subFolder -ErrorAction SilentlyContinue | Select-Object -First 1
+                if ($found) {
+                    Copy-Item -Path "$($found.FullName)\*" -Destination $targetPath -Recurse -Force -ErrorAction SilentlyContinue
+                } else {
+                    Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force -ErrorAction SilentlyContinue
+                }
             } else {
-                Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force
-            }
-        } else {
-            $rootItems = Get-ChildItem -Path $tempExtract
-            if ($rootItems.Count -eq 1 -and $rootItems[0].PSIsContainer) {
-                Copy-Item -Path "$($rootItems[0].FullName)\*" -Destination $targetPath -Recurse -Force
-            } else {
-                Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force
+                $rootItems = Get-ChildItem -Path $tempExtract -ErrorAction SilentlyContinue
+                if ($null -ne $rootItems -and $rootItems.Count -eq 1 -and $rootItems[0].PSIsContainer) {
+                    Copy-Item -Path "$($rootItems[0].FullName)\*" -Destination $targetPath -Recurse -Force -ErrorAction SilentlyContinue
+                } elseif ($null -ne $rootItems -and $rootItems.Count -gt 0) {
+                    Copy-Item -Path "$tempExtract\*" -Destination $targetPath -Recurse -Force -ErrorAction SilentlyContinue
+                }
             }
         }
         Remove-Item -Path $zipFile, $tempExtract -Recurse -Force -ErrorAction SilentlyContinue
