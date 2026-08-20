@@ -144,7 +144,20 @@ if ((Test-Path "$ServicesDir\mysql\bin\mysql_install_db.exe") -and (-not (Test-P
     & "$ServicesDir\mysql\bin\mysql_install_db.exe" "--datadir=$ServicesDir\mysql\data" 2>$null | Out-Null
 }
 
-# 5. Git Portable (if git missing on host)
+# 5. Composer for PHP
+if (-not (Test-Path "$ServicesDir\php\composer.phar")) {
+    Write-Host "      [..] Setting up Composer package manager..." -ForegroundColor Cyan
+    try {
+        Invoke-WebRequest -Uri "https://getcomposer.org/composer.phar" -OutFile "$ServicesDir\php\composer.phar" -UserAgent "Mozilla/5.0" -UseBasicParsing
+        $ComposerBat = "@echo off`r`n`"%~dp0php.exe`" `"%~dp0composer.phar`" %*"
+        Set-Content -Path "$ServicesDir\php\composer.bat" -Value $ComposerBat -Encoding ASCII
+        Write-Host "      [OK] Composer is ready." -ForegroundColor Green
+    } catch {
+        Write-Host "      [!] Note: Composer download skipped - $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+}
+
+# 6. Git Portable (if git missing on host)
 if (-not (Get-Command git -ErrorAction SilentlyContinue) -and (-not (Test-Path "$ServicesDir\git\cmd\git.exe"))) {
     Install-ZipPackage "MinGit" "https://github.com/git-for-windows/git/releases/download/v2.45.0.windows.1/MinGit-2.45.0-64-bit.zip" "$ServicesDir\git" "cmd\git.exe"
 }
@@ -180,6 +193,7 @@ if (Test-Path "$ServicesDir\php") {
                 'session.save_path = "C:/DDS/tmp"',
                 'sys_temp_dir = "C:/DDS/tmp"',
                 'upload_tmp_dir = "C:/DDS/tmp"',
+                'cgi.force_redirect = 0',
                 'session.cookie_httponly = 1',
                 'session.use_only_cookies = 1',
                 'session.gc_maxlifetime = 1440',
@@ -311,7 +325,7 @@ try {
 Write-Host "[6/6] Registering 'dds' command in Windows PATH..." -ForegroundColor Cyan
 try {
     $UserPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
-    $PathsToAdd = @($ScriptDir, "$ServicesDir\git\cmd", "$ServicesDir\nodejs")
+    $PathsToAdd = @($ScriptDir, "$ServicesDir\php", "$ServicesDir\mysql\bin", "$ServicesDir\git\cmd", "$ServicesDir\nodejs")
     
     foreach ($p in $PathsToAdd) {
         if ($UserPath -notlike "*$p*") {
@@ -320,7 +334,7 @@ try {
             $env:Path = "$p;" + $env:Path
         }
     }
-    Write-Host "      [OK] 'dds' command registered in User PATH." -ForegroundColor Green
+    Write-Host "      [OK] 'dds', 'php', 'composer', and 'mysql' registered in User PATH." -ForegroundColor Green
 } catch {
     Write-Host "      Registered in current session." -ForegroundColor Yellow
 }

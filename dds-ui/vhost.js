@@ -20,6 +20,24 @@ function existingPorts() {
   return ports;
 }
 
+export function resolveDocumentRoot(baseRoot) {
+  if (!baseRoot) return baseRoot;
+  const publicDirs = ['public', 'public_html', 'web', 'htdocs', 'www'];
+  for (const dir of publicDirs) {
+    const candidate = path.join(baseRoot, dir);
+    if (existsSync(candidate)) {
+      if (
+        existsSync(path.join(candidate, 'index.php')) ||
+        existsSync(path.join(candidate, 'index.html')) ||
+        existsSync(path.join(candidate, 'index.htm'))
+      ) {
+        return candidate;
+      }
+    }
+  }
+  return baseRoot;
+}
+
 export function generateVhostConfig() {
   const hosts = getHosts();
   const existing = existingPorts();
@@ -48,19 +66,29 @@ export function generateVhostConfig() {
   for (const host of hosts) {
     const port = host.port;
     const serverName = host.name === 'default' ? 'localhost' : `${host.name}.localhost`;
-    const root = toApachePath(host.root);
-    ensureDir(root);
+    const baseRoot = toApachePath(host.root);
+    ensureDir(baseRoot);
+    const docRoot = toApachePath(resolveDocumentRoot(host.root));
+    if (docRoot !== baseRoot) ensureDir(docRoot);
 
     blocks.push(`<VirtualHost *:${port}>`);
-    blocks.push(`    DocumentRoot "${root}"`);
+    blocks.push(`    DocumentRoot "${docRoot}"`);
     blocks.push(`    ServerName ${serverName}`);
     blocks.push('');
-    blocks.push(`    <Directory "${root}">`);
+    blocks.push(`    <Directory "${docRoot}">`);
     blocks.push('        Options Indexes FollowSymLinks ExecCGI');
     blocks.push('        AllowOverride All');
     blocks.push('        Require all granted');
     blocks.push('        DirectoryIndex index.php index.html index.htm');
     blocks.push('    </Directory>');
+    if (docRoot !== baseRoot) {
+      blocks.push('');
+      blocks.push(`    <Directory "${baseRoot}">`);
+      blocks.push('        Options Indexes FollowSymLinks ExecCGI');
+      blocks.push('        AllowOverride All');
+      blocks.push('        Require all granted');
+      blocks.push('    </Directory>');
+    }
     blocks.push('');
     blocks.push(`    ErrorLog "${logsDir}/${host.name}_error.log"`);
     blocks.push(`    CustomLog "${logsDir}/${host.name}_access.log" common`);
@@ -80,25 +108,34 @@ export function generateVhostConfig() {
       while (existing.has(sslPort)) sslPort++;
       existing.add(sslPort);
 
-      const root = toApachePath(host.root);
+      const baseRoot = toApachePath(host.root);
+      const docRoot = toApachePath(resolveDocumentRoot(host.root));
       const serverName = `${host.name}.localhost`;
 
       blocks.push(`Listen ${sslPort}`);
       blocks.push('');
       blocks.push(`<VirtualHost *:${sslPort}>`);
-      blocks.push(`    DocumentRoot "${root}"`);
+      blocks.push(`    DocumentRoot "${docRoot}"`);
       blocks.push(`    ServerName ${serverName}`);
       blocks.push('');
       blocks.push('    SSLEngine on');
       blocks.push(`    SSLCertificateFile "${cert}"`);
       blocks.push(`    SSLCertificateKeyFile "${key}"`);
       blocks.push('');
-      blocks.push(`    <Directory "${root}">`);
+      blocks.push(`    <Directory "${docRoot}">`);
       blocks.push('        Options Indexes FollowSymLinks ExecCGI');
       blocks.push('        AllowOverride All');
       blocks.push('        Require all granted');
       blocks.push('        DirectoryIndex index.php index.html index.htm');
       blocks.push('    </Directory>');
+      if (docRoot !== baseRoot) {
+        blocks.push('');
+        blocks.push(`    <Directory "${baseRoot}">`);
+        blocks.push('        Options Indexes FollowSymLinks ExecCGI');
+        blocks.push('        AllowOverride All');
+        blocks.push('        Require all granted');
+        blocks.push('    </Directory>');
+      }
       blocks.push('');
       blocks.push(`    ErrorLog "${logsDir}/${host.name}_ssl_error.log"`);
       blocks.push(`    CustomLog "${logsDir}/${host.name}_ssl_access.log" common`);

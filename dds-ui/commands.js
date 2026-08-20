@@ -213,7 +213,7 @@ export async function doStop() {
 export async function doRestart() {
   renderHeader('Restarting DDS');
   await doStop();
-  await new Promise(r => setTimeout(r, 800));
+  await new Promise(r => setTimeout(r, 1200));
   await doStart();
 }
 
