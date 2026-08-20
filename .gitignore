@@ -12,8 +12,9 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-# Editor files
+# Editor & AI files
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
+.openchat/
